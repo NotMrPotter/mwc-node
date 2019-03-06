@@ -51,6 +51,7 @@ fn test_transaction_pool_block_reconciliation() {
 				&key_id,
 				0,
 				false,
+				height,
 			)
 			.unwrap();
 			let genesis = BlockHeader::default();
@@ -78,6 +79,7 @@ fn test_transaction_pool_block_reconciliation() {
 				&key_id,
 				fees,
 				false,
+				header.height + 1,
 			)
 			.unwrap();
 			let mut block =
@@ -179,6 +181,7 @@ fn test_transaction_pool_block_reconciliation() {
 				&key_id,
 				fees,
 				false,
+				header.height + 1,
 			)
 			.unwrap();
 			let mut block = Block::new(&header, block_txs, Difficulty::min(), reward).unwrap();

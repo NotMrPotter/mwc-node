@@ -231,6 +231,7 @@ fn burn_reward(block_fees: BlockFees) -> Result<(core::Output, core::TxKernel, B
 		&key_id,
 		block_fees.fees,
 		false,
+		block_fees.height,
 	)
 	.unwrap();
 	Ok((out, kernel, block_fees))

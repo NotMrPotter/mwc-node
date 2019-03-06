@@ -53,6 +53,7 @@ fn test_transaction_pool_block_building() {
 					&key_id,
 					fee,
 					false,
+					height,
 				)
 				.unwrap();
 				let mut block = Block::new(&prev_header, txs, Difficulty::min(), reward).unwrap();

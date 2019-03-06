@@ -106,13 +106,15 @@ fn mine_genesis_reward_chain() {
 	let mut genesis = genesis::genesis_dev();
 	let keychain = keychain::ExtKeychain::from_random_seed(false).unwrap();
 	let key_id = keychain::ExtKeychain::derive_key_id(0, 1, 0, 0, 0);
+	// MWC - genesis block with reward. 0 - the height of genesis block
 	let reward = reward::output(
 		&keychain,
 		&libtx::ProofBuilder::new(&keychain),
 		&key_id,
 		0,
 		false,
-	)
+		0,
+	0)
 	.unwrap();
 	genesis = genesis.with_reward(reward.0, reward.1);
 
@@ -151,7 +153,7 @@ where
 		let next_header_info = consensus::next_difficulty(1, chain.difficulty_iter().unwrap());
 		let pk = ExtKeychainPath::new(1, n as u32, 0, 0, 0).to_identifier();
 		let reward =
-			libtx::reward::output(keychain, &libtx::ProofBuilder::new(keychain), &pk, 0, false)
+			libtx::reward::output(keychain, &libtx::ProofBuilder::new(keychain), &pk, 0, false, prev.height + 1)
 				.unwrap();
 		let mut b =
 			core::core::Block::new(&prev, vec![], next_header_info.clone().difficulty, reward)
@@ -439,8 +441,9 @@ fn spend_in_fork_and_compact() {
 
 		let tx1 = build::transaction(
 			vec![
-				build::coinbase_input(consensus::REWARD, key_id2.clone()),
-				build::output(consensus::REWARD - 20000, key_id30.clone()),
+				// MWC - reward block are from the first group
+				build::coinbase_input(consensus::MWC_FIRST_GROUP_REWARD, key_id2.clone()),
+				build::output(consensus::MWC_FIRST_GROUP_REWARD - 20000, key_id30.clone()),
 				build::with_fee(20000),
 			],
 			&kc,
@@ -457,8 +460,9 @@ fn spend_in_fork_and_compact() {
 
 		let tx2 = build::transaction(
 			vec![
-				build::input(consensus::REWARD - 20000, key_id30.clone()),
-				build::output(consensus::REWARD - 40000, key_id31.clone()),
+				// MWC - reward block are from the first group
+				build::input(consensus::MWC_FIRST_GROUP_REWARD - 20000, key_id30.clone()),
+				build::output(consensus::MWC_FIRST_GROUP_REWARD - 40000, key_id31.clone()),
 				build::with_fee(20000),
 			],
 			&kc,
@@ -558,6 +562,7 @@ fn output_header_mappings() {
 				&pk,
 				0,
 				false,
+				prev.height + 1,
 			)
 			.unwrap();
 			reward_outputs.push(reward.0.clone());
@@ -663,7 +668,7 @@ where
 
 	let fees = txs.iter().map(|tx| tx.fee()).sum();
 	let reward =
-		libtx::reward::output(kc, &libtx::ProofBuilder::new(kc), &key_id, fees, false).unwrap();
+		libtx::reward::output(kc, &libtx::ProofBuilder::new(kc), &key_id, fees, false, prev.height + 1).unwrap();
 	let mut b = match core::core::Block::new(
 		prev,
 		txs.into_iter().cloned().collect(),

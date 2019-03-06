@@ -60,12 +60,14 @@ fn test_various_store_indices() {
 
 	setup_chain(&genesis, chain_store.clone()).unwrap();
 
+	// MWC it is a first block, so height will be one
 	let reward = libtx::reward::output(
 		&keychain,
 		&libtx::ProofBuilder::new(&keychain),
 		&key_id,
 		0,
 		false,
+		1,
 	)
 	.unwrap();
 	let block = Block::new(&genesis.header, vec![], Difficulty::min(), reward).unwrap();
