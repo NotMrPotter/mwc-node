@@ -260,6 +260,7 @@ fn test_the_transaction_pool() {
 				&key_id,
 				0,
 				false,
+				1
 			)
 			.unwrap();
 			let block =
